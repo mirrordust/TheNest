@@ -1,0 +1,13 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div>
+    <ul>
+        <li th:each="apk : ${apks}">
+            <a th:href="${apk}">app</a>
+        </li>
+    </ul>
+</div>
+
+</body>
+</html>

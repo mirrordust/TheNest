@@ -2,6 +2,8 @@ target/
 
 uploads/
 
+downloads/
+
 # User-specific stuff:
 .idea/**/workspace.xml
 .idea/**/tasks.xml

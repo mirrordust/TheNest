@@ -27,7 +27,6 @@ public class FileUploadController {
     @GetMapping("/")
     public String listUploadedFiles(Model model) throws IOException {
 
-
         model.addAttribute("files", storageService.loadAll().map(
                 path -> new FileDesc(path.getFileName().toString(),
                         MvcUriComponentsBuilder.fromMethodName(FileUploadController.class,
@@ -39,11 +38,21 @@ public class FileUploadController {
         return "uploadForm";
     }
 
+    @GetMapping("/downloads")
+    public String showApp(Model model) throws IOException {
+        model.addAttribute("apks", storageService.loadApk().map(
+                path -> MvcUriComponentsBuilder.fromMethodName(FileUploadController.class,
+                                "serveApk", path.getFileName().toString()).build().toString())
+                .collect(Collectors.toList()));
+
+        return "app";
+    }
+
     @GetMapping("/files/{filename:.+}")
     @ResponseBody
     public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
 
-        Resource file = storageService.loadAsResource(filename);
+        Resource file = storageService.loadAsResource(filename, true);
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
                 "attachment; filename=\"" + file.getFilename() + "\"").body(file);
     }
@@ -51,9 +60,17 @@ public class FileUploadController {
     @GetMapping("/files/view/{filename:.+}")
     @ResponseBody
     public ResponseEntity<Resource> viewFile(@PathVariable String filename) {
-        Resource file = storageService.loadAsResource(filename);
+        Resource file = storageService.loadAsResource(filename, true);
         return ResponseEntity.ok().header(
                 "attachment; filename=\"" + file.getFilename() + "\"").body(file);
+    }
+
+    @GetMapping("/apk/{apkname:.+}")
+    @ResponseBody
+    public ResponseEntity<Resource> serveApk(@PathVariable String apkname) {
+        Resource apk = storageService.loadAsResource(apkname, false);
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=\"" + apk.getFilename() + "\"").body(apk);
     }
 
     @PostMapping("/")

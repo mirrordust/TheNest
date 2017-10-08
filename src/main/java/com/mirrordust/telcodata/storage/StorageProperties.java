@@ -10,6 +10,11 @@ public class StorageProperties {
      */
     private String location = "uploads";
 
+    /**
+     * Folder location for app (apk file)
+     */
+    private String appLocation = "downloads";
+
     public String getLocation() {
         return location;
     }
@@ -18,4 +23,11 @@ public class StorageProperties {
         this.location = location;
     }
 
+    public String getAppLocation() {
+        return appLocation;
+    }
+
+    public void setAppLocation(String appLocation) {
+        this.appLocation = appLocation;
+    }
 }

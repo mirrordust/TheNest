@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.FileSystemUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +21,7 @@ import java.util.stream.Stream;
 @Service
 public class FileSystemStorageService implements StorageService {
     private final Path rootLocation;
+    private final Path apkLocation;
     private final Set<String> ALLOWED_EXTENSIONS = new HashSet<String>() {{
         add("txt");
     }};
@@ -29,6 +29,7 @@ public class FileSystemStorageService implements StorageService {
     @Autowired
     public FileSystemStorageService(StorageProperties properties) {
         this.rootLocation = Paths.get(properties.getLocation());
+        this.apkLocation = Paths.get(properties.getAppLocation());
     }
 
     @Override
@@ -63,7 +64,17 @@ public class FileSystemStorageService implements StorageService {
         } catch (IOException e) {
             throw new StorageException("Failed to read stored files", e);
         }
+    }
 
+    @Override
+    public Stream<Path> loadApk() {
+        try {
+            return Files.walk(this.apkLocation, 1)
+                    .filter(path -> !path.equals(this.apkLocation))
+                    .map(this.apkLocation::relativize);
+        } catch (IOException e) {
+            throw new StorageException("Failed to read apk file", e);
+        }
     }
 
     @Override
@@ -72,9 +83,19 @@ public class FileSystemStorageService implements StorageService {
     }
 
     @Override
-    public Resource loadAsResource(String filename) {
+    public Path loadApk(String apkname) {
+        return apkLocation.resolve(apkname);
+    }
+
+    @Override
+    public Resource loadAsResource(String filename, boolean isDataSet) {
         try {
-            Path file = load(filename);
+            Path file;
+            if (isDataSet) {
+                file = load(filename);
+            } else {
+                file = loadApk(filename);
+            }
             Resource resource = new UrlResource(file.toUri());
             if (resource.exists() || resource.isReadable()) {
                 return resource;
@@ -88,15 +109,16 @@ public class FileSystemStorageService implements StorageService {
         }
     }
 
-    @Override
-    public void deleteAll() {
-        FileSystemUtils.deleteRecursively(rootLocation.toFile());
-    }
+//    @Override
+//    public void deleteAll() {
+//        FileSystemUtils.deleteRecursively(rootLocation.toFile());
+//    }
 
     @Override
     public void init() {
         try {
             Files.createDirectories(rootLocation);
+            Files.createDirectories(apkLocation);
         } catch (IOException e) {
             throw new StorageException("Could not initialize storage", e);
         }

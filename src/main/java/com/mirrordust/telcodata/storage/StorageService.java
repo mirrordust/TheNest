@@ -13,9 +13,12 @@ public interface StorageService {
 
     Stream<Path> loadAll();
 
+    Stream<Path> loadApk();
+
     Path load(String filename);
 
-    Resource loadAsResource(String filename);
+    Path loadApk(String apkname);
 
-    void deleteAll();
+    Resource loadAsResource(String filename, boolean isDataSet);
+//    void deleteAll();
 }
