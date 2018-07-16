@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/TelecomDataServer.iml" filepath="$PROJECT_DIR$/TelecomDataServer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/TheNest.iml" filepath="$PROJECT_DIR$/TheNest.iml" />
     </modules>
   </component>
 </project>
